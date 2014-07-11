@@ -17,7 +17,7 @@ if(!Config.proxies || Config.proxies.length === 0) throw new Error('there are no
 var Proxies         = Config.proxies, 
     Port            = Config.port, 
     RepairTime      = Config.repairTime, 
-    DefaultTimeout  = Config.DefaultTimeout, 
+    DefaultTimeout  = Config.defaultTimeout, 
     Broken = {}, 
     Index = {}
 
