@@ -68,48 +68,51 @@ function onError (url, proxy) {
  * Handle the incoming request.
  */
 function handleRequest (req, res) {
-  var query = querystring.parse(req.url.substring(1))
+  var query = querystring.parse(req.url.substring(1)), proxy, url, options
 
   try {
     if(!query.url) throw new Error('provide a url parameter, for example: service:' + Port + '/url=www.google.de')
 
-    var url = parseUrl(query.url, true);
+    url = parseUrl(query.url, true);
 
     if(!url.host) {
       url = parseUrl('http://' + query.url)
       if(!url.host) throw new Error('supply a proper url, for example: url=google.de')
     }
 
-    var proxy = proxy = nextProxy(url.host)
+    proxy = proxy = nextProxy(url.host)
 
-    var options = {
+    options = {
       url: url,
       proxy: proxy,
       timeout: query.timeout || DefaultTimeout
     }
 
-    request.get(options, sendResponse(res))
+    request.get(options, sendResponse(proxy, res))
            .on('error', onError(url, proxy))
   } catch(e) {
-    sendResponse(res)(e)
+    sendResponse(proxy || 'undefined', res)(e)
   }
 }
 
 /**
  * Send the actual response to the client.
  */
-function sendResponse (res) {
+function sendResponse (proxy, res) {
   return function (err, response, body) {
     if(err) {
       res.writeHead(500, {
         'Content-Length': err.message? err.message.length: 0,
-        'Content-Type': 'text/plain'
+        'Content-Type': 'text/plain',
+        'x-proxy': proxy
       })
-      res.end(err.message || '');
+      res.end(err.message || '')
     }
     else {
-      res.writeHead(response.statusCode, response.headers)
-      res.end(body);
+      var header = response.headers
+      header['x-proxy'] = proxy
+      res.writeHead(response.statusCode, header)
+      res.end(body)
     }
   }
 }
