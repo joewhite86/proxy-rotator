@@ -1,0 +1,15 @@
+{
+  "name": "proxy-rotator",
+  "version": "0.0.4",
+  "description": "Simple proxy rotation service",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jochen Weis",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.5.1",
+    "request": "~2.37.0"
+  }
+}
