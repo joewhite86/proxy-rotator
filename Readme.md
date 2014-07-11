@@ -13,7 +13,7 @@
 npm install proxy-rotator
 cd node_modules/proxy-rotator
 // fill in your proxies: ["http://user@pass:proxy.server:port"]
-vim proxy.json
+vim config.json
 ```
 
 ## Start
