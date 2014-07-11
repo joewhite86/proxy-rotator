@@ -9,7 +9,6 @@
   "author": "Jochen Weis",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.5.1",
     "request": "~2.37.0"
   }
 }
