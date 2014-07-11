@@ -1,2 +1,3 @@
-prosy.json
+syntax: glob
+proxy.json
 node_modules
