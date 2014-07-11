@@ -1,0 +1,6 @@
+{
+  "defaultTimeout": 5000,
+  "port": 8000,
+  "repairTime": 86400,
+  "proxies": []
+}

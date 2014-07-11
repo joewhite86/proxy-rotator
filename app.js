@@ -4,35 +4,41 @@ var http = require('http'),
     request = require('request'),
     fs = require('fs'),
     querystring = require('querystring'),
-    parseUrl = require('url').parse, 
-    broken = {}, 
-    index = {}
+    parseUrl = require('url').parse
 
-// constants
-var Port = 8000, ProxyFile = 'proxy.json', RepairTime = 1 * 86400, DefaultTimeout = 5000;
+var ConfigFile = 'config.json'
 
 // read the proxy file
-var proxys = JSON.parse(fs.readFileSync(ProxyFile, 'utf8'))
-if(proxys.length === 0) throw new Error('there are no proxies in ' + ProxyFile)
+var Config = JSON.parse(fs.readFileSync(ConfigFile, 'utf8'))
+
+if(!Config.proxies || Config.proxies.length === 0) throw new Error('there are no proxies in ' + ConfigFile)
+
+// get config settings
+var Proxies         = Config.proxies, 
+    Port            = Config.port, 
+    RepairTime      = Config.repairTime, 
+    DefaultTimeout  = Config.DefaultTimeout, 
+    Broken = {}, 
+    Index = {}
 
 /**
  * gets the next proxy from the list
  */
 function nextProxy (host) {
   // increment the index value for the host
-  if(typeof index[host] === 'undefined' || proxys.length === index[host] + 1) index[host] = 0
-  else index[host]++
+  if(typeof Index[host] === 'undefined' || Proxies.length === Index[host] + 1) Index[host] = 0
+  else Index[host]++
 
-  var proxy = proxys[index[host]]
+  var proxy = Proxies[Index[host]]
 
   // check broken hosts
-  if(broken[host]) {
-    if(broken[host].length === proxys.length) {
+  if(Broken[host]) {
+    if(Broken[host].length === Proxies.length) {
       throw new Error('all proxies timed out for ' + host + ', consider using the "timeout" parameter')
     }
-    else if(broken[host][proxy]) {
+    else if(Broken[host][proxy]) {
       // when repair time is over we try the proxy again, so nextProxy isn't called
-      if(Date.now() < broken[host][proxy] + RepairTime) return nextProxy(host)
+      if(Date.now() < Broken[host][proxy] + RepairTime) return nextProxy(host)
     }
   }
 
@@ -44,12 +50,12 @@ function nextProxy (host) {
  */
 function onError (url, proxy) {
   return function (err) {
-    // handle timeout as broken proxy
+    // handle timeout as Broken proxy
     if(err.code === 'ETIMEDOUT') {
-      if(!broken[url.host]) {
-        broken[url.host] = {}
+      if(!Broken[url.host]) {
+        Broken[url.host] = {}
       }
-      broken[url.host][proxy] = Date.now()
+      Broken[url.host][proxy] = Date.now()
       console.log('added ' + proxy + ' to broken list for host ' + url.host)
     }
     else {
