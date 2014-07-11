@@ -9,25 +9,25 @@
 
 
 ## Installation
-    ```bash
-    npm install proxy-rotator
-    cd node_modules/proxy-rotator
-    // fill in your proxies: ["http://user@pass:proxy.server:port"]
-    vim proxy.json
-    ```
+```bash
+npm install proxy-rotator
+cd node_modules/proxy-rotator
+// fill in your proxies: ["http://user@pass:proxy.server:port"]
+vim proxy.json
+```
 
 ## Start
-    ```bash
-    // using forever is recommended
-    forever start app
-    // the default way
-    node app
-    ```
+```bash
+// using forever is recommended
+forever start app
+// the default way
+node app
+```
 
 ## Usage
-    ```bash
-    curl 'localhost:8000/timeout=5000&url=https://google.de'
-    ```
+```bash
+curl 'localhost:8000/timeout=5000&url=https://google.de'
+```
     
 ## Licence
 The MIT License (MIT)
