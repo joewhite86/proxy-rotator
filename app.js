@@ -16,7 +16,7 @@ if(!Config.proxies || Config.proxies.length === 0) throw new Error('there are no
 // get config settings
 var Proxies         = Config.proxies, 
     Port            = Config.port, 
-    RepairTime      = Config.repairTime, 
+    RepairTime      = Config.repairTime*1000, 
     DefaultTimeout  = Config.defaultTimeout, 
     Broken = {}, 
     Index = {}
@@ -32,17 +32,40 @@ function nextProxy (host) {
   var proxy = Proxies[Index[host]]
 
   // check broken hosts
-  if(Broken[host]) {
+  if(typeof Broken[host] !== 'undefined') {
     if(Broken[host].length === Proxies.length) {
       throw new Error('all proxies timed out for ' + host + ', consider using the "timeout" parameter')
     }
     else if(Broken[host][proxy]) {
       // when repair time is over we try the proxy again, so nextProxy isn't called
       if(Date.now() < Broken[host][proxy] + RepairTime) return nextProxy(host)
+      else Broken[host][proxy] = undefined
     }
   }
 
   return proxy
+}
+
+/**
+ * Send the actual response to the client.
+ */
+function sendResponse (proxy, res) {
+  return function (err, response, body) {
+    if(err) {
+      res.writeHead(500, {
+        'Content-Length': err.message? err.message.length: 0,
+        'Content-Type': 'text/plain',
+        'x-proxy': proxy
+      })
+      res.end(err.message || '')
+    }
+    else {
+      var header = response.headers
+      header['x-proxy'] = proxy
+      res.writeHead(response.statusCode, header)
+      res.end(body)
+    }
+  }
 }
 
 /**
@@ -92,28 +115,6 @@ function handleRequest (req, res) {
            .on('error', onError(url, proxy))
   } catch(e) {
     sendResponse(proxy || 'undefined', res)(e)
-  }
-}
-
-/**
- * Send the actual response to the client.
- */
-function sendResponse (proxy, res) {
-  return function (err, response, body) {
-    if(err) {
-      res.writeHead(500, {
-        'Content-Length': err.message? err.message.length: 0,
-        'Content-Type': 'text/plain',
-        'x-proxy': proxy
-      })
-      res.end(err.message || '')
-    }
-    else {
-      var header = response.headers
-      header['x-proxy'] = proxy
-      res.writeHead(response.statusCode, header)
-      res.end(body)
-    }
   }
 }
 
