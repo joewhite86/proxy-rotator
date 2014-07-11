@@ -1,19 +1,34 @@
 # proxy-rotator
+
+**Simple proxy rotation service written in Node.js.**
+
+#### Features:
+
+ - Rotation per host
+ - Handling of broken proxies
+
+
 ## Installation
-    #!bash
+    ```bash
     npm install proxy-rotator
     cd node_modules/proxy-rotator
     // fill in your proxies: ["http://user@pass:proxy.server:port"]
     vim proxy.json
+    ```
+
 ## Start
-    #!bash
+    ```bash
     // using forever is recommended
     forever start app
     // the default way
     node app
+    ```
+
 ## Usage
-    #!bash
+    ```bash
     curl 'localhost:8000/timeout=5000&url=https://google.de'
+    ```
+    
 ## Licence
 The MIT License (MIT)
 
