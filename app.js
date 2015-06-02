@@ -17,7 +17,8 @@ if(!Config.proxies || Config.proxies.length === 0) throw new Error('there are no
 var Proxies         = Config.proxies, 
     Port            = Config.port, 
     RepairTime      = Config.repairTime*1000, 
-    DefaultTimeout  = Config.defaultTimeout, 
+    DefaultTimeout  = Config.defaultTimeout,
+    BindAddress     = Config.bindAddress,
     Broken = {}, 
     Index = {}
 
@@ -26,8 +27,12 @@ var Proxies         = Config.proxies,
  */
 function nextProxy (host) {
   // increment the index value for the host
-  if(typeof Index[host] === 'undefined' || Proxies.length === Index[host] + 1) Index[host] = 0
-  else Index[host]++
+  if(typeof Index[host] === 'undefined' || Proxies.length === Index[host] + 1) {
+    Index[host] = 0
+    console.log('all proxies used, starting new cycle')
+  } else {
+    Index[host]++
+  }
 
   var proxy = Proxies[Index[host]]
 
@@ -38,8 +43,12 @@ function nextProxy (host) {
     }
     else if(Broken[host][proxy]) {
       // when repair time is over we try the proxy again, so nextProxy isn't called
-      if(Date.now() < Broken[host][proxy] + RepairTime) return nextProxy(host)
-      else Broken[host][proxy] = undefined
+      if(Date.now() < Broken[host][proxy] + RepairTime) {
+        return nextProxy(host)
+      } else {
+        console.log('reviving broken proxy ' + proxy + ' after ' + RepairTime + 'ms')
+        Broken[host][proxy] = undefined
+      }
     }
   }
 
@@ -80,8 +89,9 @@ function onError (url, proxy) {
       }
       Broken[url.host][proxy] = Date.now()
       console.log('added ' + proxy + ' to broken list for host ' + url.host)
+      console.log(Object.keys(Broken[url.host]).length + ' of ' + Proxies.length + ' proxies are now broken')
     }
-    else {
+    else if(err.code !== 'ECONNREFUSED') {
       console.log(err)
     }
   }
@@ -111,6 +121,8 @@ function handleRequest (req, res) {
       timeout: query.timeout || DefaultTimeout
     }
 
+    // console.log(query.url + ' (' + proxy + ')')
+
     request.get(options, sendResponse(proxy, res))
            .on('error', onError(url, proxy))
   } catch(e) {
@@ -121,6 +133,11 @@ function handleRequest (req, res) {
 // create the http server
 var server = http.createServer(handleRequest)
 // listen to a specific port
-server.listen(Port)
+if(BindAddress) {
+  server.listen(Port, BindAddress)
+}
+else {
+  server.listen(Port)
+}
 
-console.log('Server running at http://127.0.0.1:' + Port + '/')
+console.log('Server running at http://' + (BindAddress? BindAddress: '127.0.0.1') + ':' + Port + '/')

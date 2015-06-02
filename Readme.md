@@ -2,19 +2,29 @@
 
 **Simple proxy rotation service written in Node.js.**
 
+----------
+
 #### Features:
 
  - Rotation per host
  - Handling of broken proxies
 
-
 ## Installation
 ```bash
 npm install proxy-rotator
 cd node_modules/proxy-rotator
-// fill in your proxies: ["http://user@pass:proxy.server:port"]
 vim config.json
+// fill in your proxies: ["http://user@pass:proxy.server:port"]
 ```
+
+## Configuration
+To configure the service edit the file *config.json*
+
+- **defaultTimeout**: Timeout in ms to wait for a response if not passed with the url (default: 5000)
+- **port**: Port to listen to (default: 8000)
+- **bindAddress**: If set the service will only listen to this address (default: any)
+- **repairTime**: Time in seconds a proxy which is broken takes for the next try
+- **proxies**: Array of proxies with the format: [protocol]://[username]:[password]@[ip/name]:[port] 
 
 ## Start
 ```bash
@@ -26,6 +36,7 @@ node app
 
 ## Usage
 ```bash
+curl 'localhost:8000/url=https://google.de'
 curl 'localhost:8000/timeout=5000&url=https://google.de'
 ```
     
