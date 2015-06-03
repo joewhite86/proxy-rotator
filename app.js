@@ -39,7 +39,7 @@ function nextProxy (host) {
   // check broken hosts
   if(typeof Broken[host] !== 'undefined') {
     if(Broken[host].length === Proxies.length) {
-      throw new Error('all proxies timed out for ' + host + ', consider using the "timeout" parameter')
+      throw new Error('all proxies timed out for ' + host + ', consider using the "timeout" parameter: service:8000/timeout=5000&url=http://www.google.de')
     }
     else if(Broken[host][proxy]) {
       // when repair time is over we try the proxy again, so nextProxy isn't called
@@ -47,7 +47,7 @@ function nextProxy (host) {
         return nextProxy(host)
       } else {
         console.log('reviving broken proxy ' + proxy + ' after ' + RepairTime + 'ms')
-        Broken[host][proxy] = undefined
+        delete Broken[host][proxy]
       }
     }
   }
@@ -118,7 +118,7 @@ function handleRequest (req, res) {
     options = {
       url: url,
       proxy: proxy,
-      timeout: query.timeout || DefaultTimeout
+      timeout: (+query.timeout) || DefaultTimeout
     }
 
     // console.log(query.url + ' (' + proxy + ')')

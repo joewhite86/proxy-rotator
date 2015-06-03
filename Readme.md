@@ -20,11 +20,11 @@ vim config.json
 ## Configuration
 To configure the service edit the file *config.json*
 
-- **defaultTimeout**: Timeout in ms to wait for a response if not passed with the url (default: 5000)
+- **defaultTimeout**: Timeout in ms to wait for a response if not passed with the request (default: 5000)
 - **port**: Port to listen to (default: 8000)
-- **bindAddress**: If set the service will only listen to this address (default: any)
-- **repairTime**: Time in seconds a proxy which is broken takes for the next try
-- **proxies**: Array of proxies with the format: [protocol]://[username]:[password]@[ip/name]:[port] 
+- **bindAddress**: If set, the service will only listen to this address (default: any)
+- **repairTime**: Time in seconds a proxy is blocked until next try
+- **proxies**: Array of proxies. Format: [protocol]://[username]:[password]@[ip/name]:[port] 
 
 ## Start
 ```bash
