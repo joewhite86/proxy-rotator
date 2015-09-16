@@ -9,6 +9,10 @@
   "author": "Jochen Weis",
   "license": "MIT",
   "dependencies": {
+    "body-parser": "^1.13.1",
+    "express": "^4.12.4",
+    "knuth-shuffle": "^1.0.1",
+    "log4js": "^0.6.25",
     "request": "~2.37.0"
   }
 }
