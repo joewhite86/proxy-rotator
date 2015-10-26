@@ -1,6 +1,6 @@
 # proxy-rotator
 
-**Simple proxy rotation service written in Node.js.**
+**Proxy rotation service written in Node.js.**
 
 ----------
 
@@ -8,6 +8,9 @@
 
  - Rotation per host
  - Handling of broken proxies
+ - Handling of blocked proxies
+ - Time between requets per proxy
+ - Statistics to identify problematic proxies
 
 ## Installation
 ```bash
@@ -23,7 +26,10 @@ To configure the service edit the file *config.json*
 - **defaultTimeout**: Timeout in ms to wait for a response if not passed with the request (default: 5000)
 - **port**: Port to listen to (default: 8000)
 - **bindAddress**: If set, the service will only listen to this address (default: any)
-- **repairTime**: Time in seconds a proxy is blocked until next try
+- **repairTime**: Time in seconds a proxy is broken until next try
+- **blockTimeout**: Time in seconds a proxy is blocked until next try
+- **graceTime**: Time between requests on a single proxy
+- **logging**: See log4js
 - **proxies**: Array of proxies. Format: [protocol]://[username]:[password]@[ip/name]:[port] 
 
 ## Start
@@ -36,8 +42,8 @@ node app
 
 ## Usage
 ```bash
-curl 'localhost:8000/url=https://google.de'
-curl 'localhost:8000/timeout=5000&url=https://google.de'
+curl 'localhost:8000/?url=https://google.de'
+curl 'localhost:8000/?timeout=5000&url=https://google.de'
 ```
     
 ## Licence
