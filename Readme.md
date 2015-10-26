@@ -17,7 +17,7 @@
 npm install proxy-rotator
 cd node_modules/proxy-rotator
 vim config.json
-// fill in your proxies: ["http://user@pass:proxy.server:port"]
+// fill in your proxies: ["http://user:pass@proxy.server:port"]
 ```
 
 ## Configuration
