@@ -22,6 +22,7 @@ var Port            = Config.port,
     DefaultTimeout  = Config.defaultTimeout,
     BindAddress     = Config.bindAddress,
     GraceTime       = Config.graceTime || 0,
+    NextReqTimeout  = Config.nextRequestTimeout || 2000,
     BlockErrors     = ['ETIMEDOUT', 'ECONNRESET', 'EHOSTUNREACH', 'ESOCKETTIMEDOUT', 'ECONNREFUSED']
 
 app.use(bodyParser.json());
@@ -49,7 +50,7 @@ if(fs.existsSync('.proxies.tmp')) {
   })
 }
 
-setInterval(reportStatus, 30000)
+setInterval(reportStatus, 10000)
 
 function admin(req, res) {
   if(!req.body) {
@@ -76,9 +77,9 @@ function admin(req, res) {
 }
 
 function reportStatus() {
-  var status = Proxies.status()
+  var status = Proxies.status()  
   status['wait (s)'] = Proxies.waitTime? Math.round(Proxies.waitTime / 1000): 0
-  console.log(JSON.stringify(status, null, 4))
+  logger.info(JSON.stringify(status))
 }
 
 function sendProxies(req, res) {
@@ -140,7 +141,7 @@ function handleRequest (req, res) {
     // handle grace time for preventing blocks or/and send the request
     if(GraceTime !== 0 && proxy.lastRequest && Date.now() < proxy.lastRequest.getTime() + GraceTime) {
       var wait = proxy.lastRequest.getTime() + GraceTime - Date.now()
-      logger.info('have to wait for %sms to prevent a block on proxy %s', wait, proxy.proxy)
+      logger.debug('have to wait for %sms to prevent a block on proxy %s', wait, proxy.proxy)
       Proxies.waitTime+= wait
       setTimeout(function() {
         sendRequest(proxy, url, timeout, req, res)
@@ -181,7 +182,7 @@ function sendResponse(proxy, req, res) {
       })
       res.status(500).end(err.message || '')
       return
-    } else if( response.statusCode === 403 ) {
+    } else if(response.statusCode === 403) {
       logger.error(proxy.proxy + ' is blocked')
       proxy.blocked = new Date()
       if(Proxies.allBlocked()) {
@@ -189,7 +190,7 @@ function sendResponse(proxy, req, res) {
       }
       return setTimeout(function() {
         handleRequest(req, res)
-      }, 1000)
+      }, NextReqTimeout)
     }
     var header = response.headers
     proxy.hits++

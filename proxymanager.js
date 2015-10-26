@@ -27,18 +27,18 @@ ProxyManager.status = function() {
   var now = Date.now()
   var status = {
     proxies: list.length,
-    active: 0,
+    alive: 0,
     error: 0,
     broken: 0,
     blocked: 0,
     inUse: 0
   }
   list.forEach(function(proxy) { 
-    if(proxy.errors > MaxErrors && proxy.hits === 0) status.error++
+    if(proxy.errors >= MaxErrors && proxy.hits === 0) {status.error++;status.broken++}
     else if(proxy.broken && now < proxy.broken.getTime() + RepairTime) status.broken++
-    else if(proxy.blocked && now < proxy.blocked.getTime() + BlockTimeout) status.blocked++
-    else if(proxy.inUse) status.inUse++
-    else status.active++
+    else if(proxy.blocked && now < proxy.blocked.getTime() + BlockTimeout) {status.blocked++;status.broken++}
+    else if(proxy.inUse) {status.inUse++; status.alive++}
+    else status.alive++
   })
   return status
 }

@@ -1,6 +1,16 @@
 {
   "defaultTimeout": 5000,
   "port": 8000,
-  "repairTime": 86400,
+  "repairTime": 600,
+  "blockTimeout": 3600,
+  "logLevel": "INFO",
+  "graceTime": 150,
+  "logging": {
+    "appenders": [
+      { "type": "console" }
+    ],
+    "replaceConsole": true
+  },
   "proxies": []
 }
+
