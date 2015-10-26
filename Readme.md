@@ -42,8 +42,10 @@ node app
 
 ## Usage
 ```bash
-curl 'localhost:8000/?url=https://google.de'
-curl 'localhost:8000/?timeout=5000&url=https://google.de'
+curl 'localhost:8000?url=https://google.de'
+curl 'localhost:8000?timeout=5000&url=https://google.de'
+curl 'localhost:8000/proxies'
+curl 'localhost:8000/status'
 ```
     
 ## Licence
